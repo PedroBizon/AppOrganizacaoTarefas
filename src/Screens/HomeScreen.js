@@ -1,117 +1,143 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import Task from '../components/Task';
+import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const HomeScreen = ({ navigation }) => {
+  // Exemplo de dados de atividades
   const [tasks, setTasks] = useState([
-    { id: 1, name: 'Atividade 1', date: '15/10/2024', time: '10:00', completed: false, isLate: true },
-    { id: 2, name: 'Atividade 2', date: '21/10/2024', time: '14:00', completed: false, isLate: false },
-    { id: 3, name: 'Atividade 3', date: '21/10/2024', time: '09:00', completed: true, isLate: false },
-    { id: 4, name: 'Atividade 4', date: '15/10/2024', time: '09:00', completed: false, isLate: true },
-    // Outras tarefas
+    { id: 1, name: 'Atividade 1', date: '20/10/2024', time: '14:00', completed: false, status: 'atrasada' },
+    { id: 2, name: 'Atividade 2', date: '21/10/2024', time: '16:30', completed: false, status: 'em andamento' },
+    { id: 3, name: 'Atividade 3', date: '22/10/2024', time: '09:00', completed: true, status: 'concluída' }
   ]);
 
-  const handleCheckBoxPress = (task) => {
-    const updatedTasks = tasks.map((t) =>
-      t.id === task.id ? { ...t, completed: !t.completed } : t
+  // Função para marcar/desmarcar uma tarefa
+  const handleCheckboxPress = (id) => {
+    setTasks(prevTasks =>
+      prevTasks.map(task =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
     );
-    setTasks(updatedTasks);
-  };
-
-  const handleTaskPress = (task) => {
-    navigation.navigate('Details', { task });
-  };
-
-  const handleEditPress = (task) => {
-    navigation.navigate('Edit', { task });
-  };
-
-  const renderTasks = (filterFn) => {
-    return tasks
-      .filter(filterFn)
-      .map((task) => (
-        <Task
-          key={task.id}
-          task={task}
-          onCheckBoxPress={handleCheckBoxPress}
-          onTaskPress={handleTaskPress}
-          onEditPress={handleEditPress}
-        />
-      ));
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Suas Atividades</Text>
+    <ScrollView style={{ flex: 1, backgroundColor: '#000' }}>
+      <View style={{ padding: 20 }}>
+        {/* Imagem de Perfil */}
+        <View style={styles.header}>
+          <Text style={styles.headerText}>Suas Atividades</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('EditProfile')}>
+            <Image source={require('../../assets/perfil.png')} style={styles.profileIcon} />
+          </TouchableOpacity>
+        </View>
 
-      <TouchableOpacity 
-        style={styles.editProfileButton} 
-        onPress={() => navigation.navigate('EditProfile')}
-      >
-        <Image 
-          source={require('../../assets/perfil.png')} // Substitua pelo caminho da sua imagem
-          style={styles.editProfileIcon}
-        />
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => navigation.navigate('AddTask')}
-      >
-        <Text style={styles.addButtonText}>Adicionar Atividade</Text>
-      </TouchableOpacity>
+        <TouchableOpacity 
+          style={{ backgroundColor: '#06A77D', padding: 10, borderRadius: 10, marginVertical: 10 }}
+          onPress={() => navigation.navigate('AdicionarAtividade')}
+        >
+          <Text style={{ color: '#fff', fontSize: 18, textAlign: 'center' }}>Adicionar Atividade</Text>
+        </TouchableOpacity>
 
-      {/* Seção Atividades Atrasadas */}
-      <Text style={styles.sectionTitle}>Atividades Atrasadas</Text>
-      {renderTasks(task => !task.completed && task.isLate)}
+        {/* Seção de Atividades Atrasadas */}
+        <Text style={{ color: '#fff', fontSize: 20, marginVertical: 10 }}>ATIVIDADES ATRASADAS</Text>
+        {tasks.filter(task => task.status === 'atrasada').map(task => (
+          <View 
+            key={task.id} 
+            style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10, backgroundColor: '#8F1D1D', padding: 10, borderRadius: 10 }}
+          >
+            <TouchableOpacity onPress={() => handleCheckboxPress(task.id)}>
+              <MaterialIcons
+                name={task.completed ? 'check-box' : 'check-box-outline-blank'}
+                size={30}
+                color={task.completed ? '#06A77D' : '#8D8D8D'}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={{ flex: 1, marginLeft: 10 }} 
+              onPress={() => navigation.navigate('VerAtividade', { taskId: task.id })}
+            >
+              <Text style={{ color: '#fff', fontSize: 16 }}>{task.name}</Text>
+              <Text style={{ color: '#aaa', fontSize: 14 }}>{`${task.date} - ${task.time}`}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('EditarAtividade', { taskId: task.id })}>
+              <MaterialIcons name="edit" size={30} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        ))}
 
-      {/* Seção Atividades Em Andamento */}
-      <Text style={styles.sectionTitle}>Atividades Em Andamento</Text>
-      {renderTasks(task => !task.completed && !task.isLate)}
+        {/* Seção de Atividades em Andamento */}
+        <Text style={{ color: '#fff', fontSize: 20, marginVertical: 10 }}>ATIVIDADES EM ANDAMENTO</Text>
+        {tasks.filter(task => task.status === 'em andamento').map(task => (
+          <View 
+            key={task.id} 
+            style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10, backgroundColor: '#0B88BF', padding: 10, borderRadius: 10 }}
+          >
+            <TouchableOpacity onPress={() => handleCheckboxPress(task.id)}>
+              <MaterialIcons
+                name={task.completed ? 'check-box' : 'check-box-outline-blank'}
+                size={30}
+                color={task.completed ? '#06A77D' : '#8D8D8D'}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={{ flex: 1, marginLeft: 10 }} 
+              onPress={() => navigation.navigate('VerAtividade', { taskId: task.id })}
+            >
+              <Text style={{ color: '#fff', fontSize: 16 }}>{task.name}</Text>
+              <Text style={{ color: '#aaa', fontSize: 14 }}>{`${task.date} - ${task.time}`}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('EditarAtividade', { taskId: task.id })}>
+              <MaterialIcons name="edit" size={30} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        ))}
 
-      {/* Seção Atividades Concluídas */}
-      <Text style={styles.sectionTitle}>Atividades Concluídas</Text>
-      {renderTasks(task => task.completed)}
+        {/* Seção de Atividades Concluídas */}
+        <Text style={{ color: '#fff', fontSize: 20, marginVertical: 10 }}>ATIVIDADES CONCLUÍDAS</Text>
+        {tasks.filter(task => task.status === 'concluída').map(task => (
+          <View 
+            key={task.id} 
+            style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10, backgroundColor: '#005377', padding: 10, borderRadius: 10 }}
+          >
+            <TouchableOpacity onPress={() => handleCheckboxPress(task.id)}>
+              <MaterialIcons
+                name={task.completed ? 'check-box' : 'check-box-outline-blank'}
+                size={30}
+                color={task.completed ? '#06A77D' : '#8D8D8D'}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={{ flex: 1, marginLeft: 10 }} 
+              onPress={() => navigation.navigate('VerAtividade', { taskId: task.id })}
+            >
+              <Text style={{ color: '#fff', fontSize: 16 }}>{task.name}</Text>
+              <Text style={{ color: '#aaa', fontSize: 14 }}>{`${task.date} - ${task.time}`}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('EditarAtividade', { taskId: task.id })}>
+              <MaterialIcons name="edit" size={30} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        ))}
+      </View>
     </ScrollView>
   );
 };
 
+export default HomeScreen;
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#000',
-  },
-  title: {
-    color: '#fff',
-    fontSize: 24,
-    marginBottom: 20,
-  },
-  addButton: {
-    backgroundColor: '#06A77D',
-    padding: 10,
-    borderRadius: 50,
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 20,
   },
-  addButtonText: {
+  headerText: {
+    fontSize: 24,
     color: '#fff',
-    fontSize: 18,
   },
-  sectionTitle: {
-    color: '#fff',
-    fontSize: 18,
-    marginTop: 20,
-  },
-  editProfileButton: {
-    position: 'absolute',
-    top: 1,
-    right: 20,
-  },
-  editProfileIcon: {
-    width: 40,
-    height: 40, 
-    resizeMode: 'contain',
-  },
+  profileIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  }
 });
-
-export default HomeScreen;
