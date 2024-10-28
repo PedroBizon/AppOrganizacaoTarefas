@@ -58,7 +58,7 @@ const HomeScreen = ({ navigation }) => {
               <Text style={{ color: '#fff', fontSize: 16 }}>{task.name}</Text>
               <Text style={{ color: '#aaa', fontSize: 14 }}>{`${task.date} - ${task.time}`}</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('EditarAtividade', { taskId: task.id })}>
+            <TouchableOpacity onPress={() => navigation.navigate('EditTask')}>
               <MaterialIcons name="edit" size={30} color="#fff" />
             </TouchableOpacity>
           </View>
@@ -85,7 +85,7 @@ const HomeScreen = ({ navigation }) => {
               <Text style={{ color: '#fff', fontSize: 16 }}>{task.name}</Text>
               <Text style={{ color: '#aaa', fontSize: 14 }}>{`${task.date} - ${task.time}`}</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('EditarAtividade', { taskId: task.id })}>
+            <TouchableOpacity onPress={() => navigation.navigate('EditTask', { taskId: task.id })}>
               <MaterialIcons name="edit" size={30} color="#fff" />
             </TouchableOpacity>
           </View>
@@ -112,7 +112,7 @@ const HomeScreen = ({ navigation }) => {
               <Text style={{ color: '#fff', fontSize: 16 }}>{task.name}</Text>
               <Text style={{ color: '#aaa', fontSize: 14 }}>{`${task.date} - ${task.time}`}</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('EditarAtividade', { taskId: task.id })}>
+            <TouchableOpacity onPress={() => navigation.navigate('EditTask', { taskId: task.id })}>
               <MaterialIcons name="edit" size={30} color="#fff" />
             </TouchableOpacity>
           </View>

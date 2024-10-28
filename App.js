@@ -6,6 +6,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import LoadingScreen from './src/screens/LoadingScreen';
 import EditProfile from './src/screens/EditProfile';
 import CreateTask from './src/screens/CreateTask';
+import EditTask from './src/screens/EditTask';
 
 const Stack = createStackNavigator();
 
@@ -19,6 +20,7 @@ export default function App() {
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="CreateTask" component={CreateTask} />
+        <Stack.Screen name="EditTask" component={EditTask} />
       </Stack.Navigator>
     </NavigationContainer>
   );
