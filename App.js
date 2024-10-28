@@ -7,6 +7,7 @@ import LoadingScreen from './src/screens/LoadingScreen';
 import EditProfile from './src/screens/EditProfile';
 import CreateTask from './src/screens/CreateTask';
 import EditTask from './src/screens/EditTask';
+import CreateAccount from './src/screens/CreateAccount';
 
 const Stack = createStackNavigator();
 
@@ -21,6 +22,7 @@ export default function App() {
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="CreateTask" component={CreateTask} />
         <Stack.Screen name="EditTask" component={EditTask} />
+        <Stack.Screen name="CreateAccount" component={CreateAccount} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, Image } from 'react-native';
-import CustomButton from '../components/CustomButton'; // Importando o componente de botão reutilizável
+import { View, TextInput, StyleSheet } from 'react-native';
+import CustomButton from '../components/CustomButton'; 
 
 const CreateTask = ({ navigation }) => {
   const [taskName, setTaskName] = useState('');
