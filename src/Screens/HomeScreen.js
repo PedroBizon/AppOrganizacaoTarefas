@@ -32,7 +32,7 @@ const HomeScreen = ({ navigation }) => {
 
         <TouchableOpacity 
           style={{ backgroundColor: '#06A77D', padding: 10, borderRadius: 10, marginVertical: 10 }}
-          onPress={() => navigation.navigate('AdicionarAtividade')}
+          onPress={() => navigation.navigate('CreateTask')}
         >
           <Text style={{ color: '#fff', fontSize: 18, textAlign: 'center' }}>Adicionar Atividade</Text>
         </TouchableOpacity>

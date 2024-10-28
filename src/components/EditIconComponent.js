@@ -1,4 +1,3 @@
-// EditIconComponent.js
 import React from 'react';
 import { TouchableOpacity, Image, StyleSheet } from 'react-native';
 

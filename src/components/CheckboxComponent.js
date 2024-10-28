@@ -1,4 +1,4 @@
-// CheckboxComponent.js
+
 import React, { useState } from 'react';
 import { TouchableOpacity, Image, StyleSheet } from 'react-native';
 
