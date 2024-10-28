@@ -53,7 +53,7 @@ const HomeScreen = ({ navigation }) => {
             </TouchableOpacity>
             <TouchableOpacity 
               style={{ flex: 1, marginLeft: 10 }} 
-              onPress={() => navigation.navigate('VerAtividade', { taskId: task.id })}
+              onPress={() => navigation.navigate('ShowTask', { taskId: task.id })}
             >
               <Text style={{ color: '#fff', fontSize: 16 }}>{task.name}</Text>
               <Text style={{ color: '#aaa', fontSize: 14 }}>{`${task.date} - ${task.time}`}</Text>
@@ -80,7 +80,7 @@ const HomeScreen = ({ navigation }) => {
             </TouchableOpacity>
             <TouchableOpacity 
               style={{ flex: 1, marginLeft: 10 }} 
-              onPress={() => navigation.navigate('VerAtividade', { taskId: task.id })}
+              onPress={() => navigation.navigate('ShowTask', { taskId: task.id })}
             >
               <Text style={{ color: '#fff', fontSize: 16 }}>{task.name}</Text>
               <Text style={{ color: '#aaa', fontSize: 14 }}>{`${task.date} - ${task.time}`}</Text>
@@ -107,7 +107,7 @@ const HomeScreen = ({ navigation }) => {
             </TouchableOpacity>
             <TouchableOpacity 
               style={{ flex: 1, marginLeft: 10 }} 
-              onPress={() => navigation.navigate('VerAtividade', { taskId: task.id })}
+              onPress={() => navigation.navigate('ShowTask', { taskId: task.id })}
             >
               <Text style={{ color: '#fff', fontSize: 16 }}>{task.name}</Text>
               <Text style={{ color: '#aaa', fontSize: 14 }}>{`${task.date} - ${task.time}`}</Text>
