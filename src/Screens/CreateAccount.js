@@ -71,7 +71,7 @@ const CreateAccount  = ({ navigation }) => {
         backgroundColor="#8D8D8D" 
         textColor="#fff"
         borderRadius={10}
-        onPress={() => navigation.navigate('Home')} 
+        onPress={() => navigation.navigate('Login')} 
       />
     </View>
   );
