@@ -17,6 +17,7 @@ return (
         value={taskName}
         onChangeText={setTaskName}
         borderRadius={10}
+        editable={false}
       />
       <TextInput
         placeholder="Descrição"
@@ -24,6 +25,7 @@ return (
         value={description}
         onChangeText={setDescription}
         borderRadius={10}
+        editable={false}
       />
       <TextInput
         placeholder="DD/MM/AAAA"
@@ -31,6 +33,7 @@ return (
         value={date}
         onChangeText={setDate}
         borderRadius={10}
+        editable={false}
       />
       <TextInput
         placeholder="hh:mm"
@@ -38,6 +41,7 @@ return (
         value={time}
         onChangeText={setTime}
         borderRadius={10}
+        editable={false}
       />
 
       {/* Botões reutilizáveis */}

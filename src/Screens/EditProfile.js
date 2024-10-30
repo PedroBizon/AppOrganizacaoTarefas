@@ -41,22 +41,6 @@ const EditProfile = ({ navigation }) => {
         onChangeText={setEmail}
         borderRadius={10}
       />
-      <TextInput
-        placeholder="Senha"
-        style={styles.input}
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-        borderRadius={10}
-      />
-      <TextInput
-        placeholder="Confirmar Senha"
-        style={styles.input}
-        secureTextEntry
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        borderRadius={10}
-      />
 
       {/* Botões reutilizáveis */}
       <CustomButton 
