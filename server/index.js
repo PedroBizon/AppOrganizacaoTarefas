@@ -1,4 +1,6 @@
 require('dotenv').config();
+console.log(process.env.PORT);
+console.log(process.env.MONGODB_URI);
 const express = require('express');
 const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes'); // Supondo que já crie a rota de usuário
