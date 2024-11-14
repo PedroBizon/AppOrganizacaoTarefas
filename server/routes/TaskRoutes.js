@@ -28,7 +28,7 @@ router.post('/create', async (req, res) => {
 module.exports = router;
 
 // Listar tarefas com filtragem de status
-router.get('/tasks', async (req, res) => {
+router.get('/', async (req, res) => {
     const { status } = req.query; // Filtro opcional de status
     try {
       const tarefas = await Task.find(status ? { status } : {});
@@ -39,7 +39,7 @@ router.get('/tasks', async (req, res) => {
   });
 
 // Editar tarefa
-router.put('/tasks/:id', async (req, res) => {
+router.put('/:id', async (req, res) => {
     const { nome, descricao, prazo } = req.body;
     try {
       const tarefaAtualizada = await Task.findByIdAndUpdate(
@@ -54,7 +54,7 @@ router.put('/tasks/:id', async (req, res) => {
   });
 
 // Excluir tarefa
-router.delete('/tasks/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
       await Task.findByIdAndDelete(req.params.id);
       res.json({ message: 'Tarefa excluída com sucesso' });
@@ -64,7 +64,7 @@ router.delete('/tasks/:id', async (req, res) => {
   });
 
 // Atualizar status da tarefa para 'Concluída'
-router.put('/tasks/:id/status', async (req, res) => {
+router.put('/:id/status', async (req, res) => {
     const { status } = req.body; // Espera-se que o status seja 'Concluída' (único status que o usuário escolherá manualmente)
     
     if (status !== 'Concluída') {
