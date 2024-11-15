@@ -31,7 +31,26 @@ router.get('/', async (req, res) => {
     } catch (error) {
       res.status(500).json({ message: 'Erro ao listar usuários' });
     }
-  });
-  
+  }); 
+// Atualizar informações do usuário
+router.put('/update/:id', async (req, res) => {
+  const { nome, email, dataNascimento, cpf } = req.body;
+
+  try {
+    const usuarioAtualizado = await User.findByIdAndUpdate(
+      req.params.id,
+      { nome, email, dataNascimento, cpf },
+      { new: true, runValidators: true } // Retorna o documento atualizado e valida os campos
+    );
+
+    if (!usuarioAtualizado) {
+      return res.status(404).json({ message: 'Usuário não encontrado' });
+    }
+
+    res.json({ message: 'Usuário atualizado com sucesso', usuario: usuarioAtualizado });
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao atualizar o usuário', error: error.message });
+  }
+});
 
 module.exports = router;
