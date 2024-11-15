@@ -22,24 +22,27 @@ const LoadingScreen = ({ navigation }) => {
       } catch (error) {
         console.log('Erro ao buscar dados do usuário:', error);
       }
-
+  
       // Após carregar, navega para a tela principal
       setTimeout(() => {
         navigation.replace('Home');
       }, 2000);
     };
-
+  
     fetchUserData();
   }, []);
 
   return (
     <View style={styles.container}>
       <Image source={require('../../assets/logo.png')} style={styles.icon} />
-      <Text style={styles.welcomeText}>Olá, {userName || 'Usuário'}!</Text>
+      <Text style={styles.welcomeText}>
+        Olá, {userName ? userName : 'Carregando...'}!
+      </Text>
       <Text style={styles.loadingText}>Bem-vindo</Text>
       <Text style={styles.loadingText}>Carregando...</Text>
     </View>
   );
+  
 };
 
 const styles = StyleSheet.create({

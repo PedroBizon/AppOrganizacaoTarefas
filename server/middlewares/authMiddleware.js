@@ -9,7 +9,7 @@ const authMiddleware = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, 'seu-segredo'); // Use a chave secreta que você usa para gerar o token
+    const decoded = jwt.verify(token, 'seuSegredo'); // Use a chave secreta que você usa para gerar o token
     req.user = decoded;
     next(); // Passa para o próximo middleware ou rota
   } catch (error) {
