@@ -1,21 +1,41 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '../services/api';
 
 const LoadingScreen = ({ navigation }) => {
+  const [userName, setUserName] = useState(''); // Para armazenar o nome do usuário
+
   useEffect(() => {
-    // Simula um carregamento de 2 segundos antes de ir para a página inicial
-    setTimeout(() => {
-      navigation.replace('Home');
-    }, 2000);
+    const fetchUserData = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token'); // Obtém o token armazenado
+        if (token) {
+          // Faz uma requisição para buscar os dados do usuário
+          const response = await api.get('/users/me', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          setUserName(response.data.nome); // Define o nome do usuário
+        }
+      } catch (error) {
+        console.log('Erro ao buscar dados do usuário:', error);
+      }
+
+      // Após carregar, navega para a tela principal
+      setTimeout(() => {
+        navigation.replace('Home');
+      }, 2000);
+    };
+
+    fetchUserData();
   }, []);
 
   return (
     <View style={styles.container}>
-      <Image
-        source={require('../../assets/logo.png')}
-        style={styles.icon}
-      />
-      <Text style={styles.welcomeText}>Olá “Nome do usuário”</Text>
+      <Image source={require('../../assets/logo.png')} style={styles.icon} />
+      <Text style={styles.welcomeText}>Olá, {userName || 'Usuário'}!</Text>
       <Text style={styles.loadingText}>Bem-vindo</Text>
       <Text style={styles.loadingText}>Carregando...</Text>
     </View>

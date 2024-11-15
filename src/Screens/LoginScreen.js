@@ -1,33 +1,49 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, Image } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '../services/api';  // Certifique-se de que o arquivo api.js está configurado corretamente.
 
 const LoginScreen = ({ navigation }) => {
-  const handleLogin = () => {
-    // Navega para a tela de carregamento
-    navigation.navigate('Loading');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-    setTimeout(() => {
-      navigation.navigate('Home');
-    }, 2000);
+  const handleLogin = async () => {
+    console.log('Email:', email, 'Senha:', password);  // Verifique se os dados estão corretos
+    try {
+      console.log('Enviando dados:', email, password); // Logando antes da requisição
+      const response = await api.post('/users/login', {
+        email,  // Utilizando o valor do email
+        senha: password,  // Utilizando o valor da senha
+      });
+      console.log('Resposta da API:', response.data); // Logando a resposta
+      const { token, nome } = response.data;
+      await AsyncStorage.setItem('token', token);
+      await AsyncStorage.setItem('nome', nome); // Armazenando nome
+
+      navigation.navigate('Loading');
+    } catch (error) {
+      console.log('Erro no login:', error);
+    }
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.loginBox}>
-        <Image
-          source={require('../../assets/logo.png')}
-          style={styles.icon}
-        />
+        <Image source={require('../../assets/logo.png')} style={styles.icon} />
         <TextInput
           placeholder="E-mail ou CPF"
           placeholderTextColor="#8D8D8D"
           style={styles.input}
+          value={email}  // Associando o valor do email
+          onChangeText={setEmail}  // Atualizando o estado do email
         />
         <TextInput
           placeholder="Senha"
           placeholderTextColor="#8D8D8D"
           secureTextEntry={true}
           style={styles.input}
+          value={password}  // Associando o valor da senha
+          onChangeText={setPassword}  // Atualizando o estado da senha
         />
         <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.buttonText}>Entrar</Text>
