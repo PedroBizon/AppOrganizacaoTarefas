@@ -63,33 +63,36 @@ router.delete('/:id', async (req, res) => {
     }
   });
 
-// Atualizar status da tarefa para 'Concluída'
+// Atualizar status da tarefa
 router.put('/:id/status', async (req, res) => {
-    const { status } = req.body; // Espera-se que o status seja 'Concluída' (único status que o usuário escolherá manualmente)
-    
-    if (status !== 'Concluída') {
-      return res.status(400).json({ message: "O status só pode ser 'Concluída'" });
-    }
+  const { status } = req.body; // O status pode ser 'Em andamento', 'Concluída' ou 'Atrasada'
   
-    try {
-      const tarefa = await Task.findById(req.params.id);
-      
-      if (!tarefa) {
-        return res.status(404).json({ message: 'Tarefa não encontrada' });
-      }
-      
-      // Se o prazo já passou, marca automaticamente como 'Atrasada' se não for 'Concluída'
-      if (tarefa.prazo < Date.now() && tarefa.status !== 'Concluída') {
+  try {
+    const tarefa = await Task.findById(req.params.id);
+    
+    if (!tarefa) {
+      return res.status(404).json({ message: 'Tarefa não encontrada' });
+    }
+
+    // Se a tarefa está sendo marcada como 'Concluída', permitimos a alteração
+    if (status === 'Concluída') {
+      tarefa.status = 'Concluída';
+    } else {
+      // Se a tarefa está sendo marcada como 'Em andamento' ou 'Atrasada'
+      tarefa.status = status;
+
+      // Se o status não for 'Concluída' e o prazo já passou, marca como 'Atrasada'
+      if (status !== 'Concluída' && tarefa.prazo < Date.now()) {
         tarefa.status = 'Atrasada';
       }
-  
-      // Atualiza o status para 'Concluída' manualmente
-      tarefa.status = status;
-      await tarefa.save();
-  
-      res.json(tarefa);
-    } catch (error) {
-      res.status(500).json({ message: 'Erro ao atualizar status da tarefa', error });
     }
-  });
+
+    await tarefa.save();
+    res.json(tarefa);
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao atualizar status da tarefa', error });
+  }
+});
+
+
   
