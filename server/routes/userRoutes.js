@@ -53,4 +53,13 @@ router.put('/update/:id', async (req, res) => {
   }
 });
 
+router.get('/me', authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id); // req.user vem do middleware de autenticação
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao buscar os dados do usuário' });
+  }
+});
+
 module.exports = router;

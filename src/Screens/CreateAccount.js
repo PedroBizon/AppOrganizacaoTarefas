@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet } from 'react-native';
-import CustomButton from '../components/CustomButton'; // Importando o componente de botão reutilizável
+import { View, TextInput, StyleSheet, Alert } from 'react-native';
+import CustomButton from '../components/CustomButton'; 
+import api from '../services/api'; // Importando a configuração da API
 
-const CreateAccount  = ({ navigation }) => {
+const CreateAccount = ({ navigation }) => {
   const [name, setName] = useState('');
   const [dob, setDob] = useState('');
   const [cpf, setCpf] = useState('');
@@ -10,36 +11,56 @@ const CreateAccount  = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  const handleCreateAccount = async () => {
+    if (password !== confirmPassword) {
+      Alert.alert('Erro', 'As senhas não coincidem.');
+      return;
+    }
+
+    try {
+      const response = await api.post('/users/register', {
+        nome: name,
+        dataNascimento: dob,
+        cpf,
+        email,
+        senha: password,
+      });
+
+      Alert.alert('Sucesso', response.data.message);
+      navigation.navigate('Login'); // Volta para a tela de login
+    } catch (error) {
+      Alert.alert(
+        'Erro',
+        error.response?.data?.message || 'Erro ao criar a conta. Tente novamente.'
+      );
+    }
+  };
+
   return (
     <View style={styles.container}>
-      {/* Inputs de edição */}
       <TextInput
         placeholder="Nome"
         style={styles.input}
         value={name}
         onChangeText={setName}
-        borderRadius={10}
       />
       <TextInput
         placeholder="Data de Nascimento"
         style={styles.input}
         value={dob}
         onChangeText={setDob}
-        borderRadius={10}
       />
       <TextInput
         placeholder="CPF"
         style={styles.input}
         value={cpf}
         onChangeText={setCpf}
-        borderRadius={10}
       />
       <TextInput
         placeholder="E-mail"
         style={styles.input}
         value={email}
         onChangeText={setEmail}
-        borderRadius={10}
       />
       <TextInput
         placeholder="Senha"
@@ -47,7 +68,6 @@ const CreateAccount  = ({ navigation }) => {
         secureTextEntry
         value={password}
         onChangeText={setPassword}
-        borderRadius={10}
       />
       <TextInput
         placeholder="Confirmar Senha"
@@ -55,23 +75,19 @@ const CreateAccount  = ({ navigation }) => {
         secureTextEntry
         value={confirmPassword}
         onChangeText={setConfirmPassword}
-        borderRadius={10}
       />
 
-      {/* Botões reutilizáveis */}
-      <CustomButton 
-        text="Criar Conta" 
-        backgroundColor="#005377" 
+      <CustomButton
+        text="Criar Conta"
+        backgroundColor="#005377"
         textColor="#fff"
-        borderRadius={10}
-        onPress={() => navigation.navigate('Home')} 
+        onPress={handleCreateAccount}
       />
-      <CustomButton 
-        text="Voltar" 
-        backgroundColor="#8D8D8D" 
+      <CustomButton
+        text="Voltar"
+        backgroundColor="#8D8D8D"
         textColor="#fff"
-        borderRadius={10}
-        onPress={() => navigation.navigate('Login')} 
+        onPress={() => navigation.navigate('Login')}
       />
     </View>
   );
