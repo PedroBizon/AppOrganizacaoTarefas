@@ -93,6 +93,18 @@ router.put('/:id/status', async (req, res) => {
     res.status(500).json({ message: 'Erro ao atualizar status da tarefa', error });
   }
 });
+// Obter detalhes de uma tarefa pelo ID
+router.get('/:id', async (req, res) => {
+  try {
+    const tarefa = await Task.findById(req.params.id);
+    if (!tarefa) {
+      return res.status(404).json({ message: 'Tarefa não encontrada' });
+    }
+    res.json(tarefa);
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao buscar a tarefa', error });
+  }
+});
 
 
   
