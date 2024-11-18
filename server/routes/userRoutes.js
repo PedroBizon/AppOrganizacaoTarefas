@@ -1,6 +1,3 @@
-const authMiddleware = require('../middlewares/authMiddleware');  // Caminho correto para o arquivo
-const jwt = require('jsonwebtoken');  // Importando o JWT
-const bcrypt = require('bcryptjs');  // Para comparar as senhas
 const express = require('express');
 const User = require('../models/user');
 
@@ -56,6 +53,7 @@ router.put('/update/:id', async (req, res) => {
   }
 });
 
+
 router.get('/me', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user.id); // req.user vem do middleware de autenticação
@@ -64,6 +62,7 @@ router.get('/me', authMiddleware, async (req, res) => {
     res.status(500).json({ message: 'Erro ao buscar os dados do usuário' });
   }
 });
+
 // Deletar conta do usuário
 router.delete('/delete/:id', async (req, res) => {
   try {
@@ -97,6 +96,5 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Erro no servidor' });
   }
 });
-
 
 module.exports = router;
