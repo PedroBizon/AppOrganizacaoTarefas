@@ -3,17 +3,20 @@ import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet, ActivityIn
 import { MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRoute } from '@react-navigation/native'; // Importando useRoute
+import { useRoute } from '@react-navigation/native';
 
 const HomeScreen = ({ navigation }) => {
   const [tasks, setTasks] = useState([]);
+  const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // Usar o hook useRoute para pegar os parâmetros de navegação
   const route = useRoute();
-  const { refresh } = route.params || {};  // Pega o parâmetro 'refresh' ou define um fallback vazio
+  const { refresh } = route.params || {};
 
-  // Função para buscar as tarefas
+  const fetchUserId = async () => {
+    const id = await AsyncStorage.getItem('userID');
+    setUserId(id);
+  };
+
   const fetchTasks = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
@@ -21,52 +24,44 @@ const HomeScreen = ({ navigation }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTasks(response.data);
-      setLoading(false); // Finaliza o loading quando as tarefas são carregadas
     } catch (error) {
       console.error('Erro ao carregar tarefas:', error);
-      setLoading(false); // Finaliza o loading mesmo em caso de erro
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Buscar tarefas quando a tela for carregada ou quando o parâmetro 'refresh' for passado
-  useEffect(() => {
-    fetchTasks();
-  }, [refresh]); // Se o parâmetro 'refresh' mudar, busca as tarefas novamente
-
-  // Função para marcar/desmarcar uma tarefa
-  // Função para marcar/desmarcar uma tarefa
-const handleCheckboxPress = async (id, currentStatus) => {
-  try {
-    const token = await AsyncStorage.getItem('token');
-    
-    // Nova lógica para alternar entre os status
-    let updatedStatus;
-    
-    // Lógica para alternar status de acordo com a situação atual
-    if (currentStatus === 'Em andamento') {
-      updatedStatus = 'Concluída'; // Se estiver "Em andamento", marca como "Concluída"
-    } else if (currentStatus === 'Concluída') {
-      updatedStatus = 'Em andamento'; // Se estiver "Concluída", marca como "Em andamento"
-    } else if (currentStatus === 'Atrasada') {
-      updatedStatus = 'Concluída'; // Se estiver "Atrasada", marca como "Concluída"
+  const handleCheckboxPress = async (id, currentStatus) => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      let updatedStatus = currentStatus === 'Em andamento' ? 'Concluída' : 'Em andamento';
+      const response = await axios.put(
+        `http://localhost:5000/api/tasks/${id}/status`,
+        { status: updatedStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setTasks(prevTasks =>
+        prevTasks.map(task =>
+          task._id === id ? { ...task, status: response.data.status } : task
+        )
+      );
+    } catch (error) {
+      console.error('Erro ao atualizar status da tarefa:', error);
     }
+  };
 
-    // Enviar a requisição para o backend para atualizar o status
-    const response = await axios.put(`http://localhost:5000/api/tasks/${id}/status`, 
-      { status: updatedStatus },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+  useEffect(() => {
+    fetchUserId();
+    fetchTasks();
+  }, [refresh]);
 
-    // Atualiza o estado das tarefas
-    setTasks(prevTasks => 
-      prevTasks.map(task => 
-        task._id === id ? { ...task, status: response.data.status } : task
-      )
-    );
-  } catch (error) {
-    console.error('Erro ao atualizar status da tarefa:', error);
-  }
-};
+  useEffect(() => {
+    if (userId) {
+      console.log("User ID fetched:", userId);
+    } else {
+      console.log("User ID not fetched yet");
+    }
+  }, [userId]);
 
   if (loading) {
     return (
@@ -81,9 +76,10 @@ const handleCheckboxPress = async (id, currentStatus) => {
       <View style={{ padding: 20 }}>
         <View style={styles.header}>
           <Text style={styles.headerText}>Suas Atividades</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('EditProfile')}>
+          <TouchableOpacity onPress={() => userId && navigation.navigate('EditProfile', { id: userId })}>
             <Image source={require('../../assets/perfil.png')} style={styles.profileIcon} />
           </TouchableOpacity>
+
         </View>
 
         <TouchableOpacity 
@@ -93,48 +89,42 @@ const handleCheckboxPress = async (id, currentStatus) => {
           <Text style={{ color: '#fff', fontSize: 18, textAlign: 'center' }}>Adicionar Atividade</Text>
         </TouchableOpacity>
 
-        {/* Renderizar tarefas conforme o status */}
-        {['atrasada', 'em andamento', 'concluída'].map(status => (
+        {['Atrasada', 'Em andamento', 'Concluída'].map(status => (
           <View key={status}>
             <Text style={{ color: '#fff', fontSize: 20, marginVertical: 10 }}>
               {`ATIVIDADES ${status.toUpperCase()}`}
             </Text>
-            {tasks.filter(task => task.status.toLowerCase() === status).map(task => (
-              <View key={task._id} style={{
-                flexDirection: 'row', 
-                alignItems: 'center', 
-                marginBottom: 10, 
-                backgroundColor: task.status === 'Em andamento' ? '#0B88BF' : 
-                                 task.status === 'Atrasada' ? '#8F1D1D' : '#052F5F', 
-                padding: 10, 
-                borderRadius: 10
-              }}>
-                <TouchableOpacity onPress={() => handleCheckboxPress(task._id, task.status)}>
-                  <MaterialIcons 
-                    name={task.status.toLowerCase() === 'concluída' ? 'check-box' : 'check-box-outline-blank'} 
-                    size={30} 
-                    color={task.status.toLowerCase() === 'concluída' ? '#06A77D' : '#8D8D8D'} 
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity style={{ flex: 1, marginLeft: 10 }} onPress={() => navigation.navigate('ShowTask', { taskId: task._id })}>
-                  <Text style={{ color: '#fff', fontSize: 16 }}>{task.nome}</Text>
-                  <Text style={{ color: '#aaa', fontSize: 14 }}>
-                    {`${new Date(task.prazo).toLocaleDateString()} - ${new Date(task.prazo).toLocaleTimeString()}`}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate('EditTask', { taskId: task._id })}>
-                  <MaterialIcons name="edit" size={30} color="#fff" />
-                </TouchableOpacity>
-              </View>
-            ))}
+            {tasks
+              .filter(task => task.status === status)
+              .map(task => (
+                <View key={task._id} style={styles.taskContainer(task.status)}>
+                  <TouchableOpacity onPress={() => handleCheckboxPress(task._id, task.status)}>
+                    <MaterialIcons
+                      name={task.status === 'Concluída' ? 'check-box' : 'check-box-outline-blank'}
+                      size={30}
+                      color={task.status === 'Concluída' ? '#06A77D' : '#8D8D8D'}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{ flex: 1, marginLeft: 10 }}
+                    onPress={() => navigation.navigate('ShowTask', { taskId: task._id })}
+                  >
+                    <Text style={{ color: '#fff', fontSize: 16 }}>{task.nome}</Text>
+                    <Text style={{ color: '#aaa', fontSize: 14 }}>
+                      {`${new Date(task.prazo).toLocaleDateString()} - ${new Date(task.prazo).toLocaleTimeString()}`}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => navigation.navigate('EditTask', { taskId: task._id })}>
+                    <MaterialIcons name="edit" size={30} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+              ))}
           </View>
         ))}
       </View>
     </ScrollView>
   );
 };
-
-export default HomeScreen;
 
 const styles = StyleSheet.create({
   header: {
@@ -158,4 +148,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#000',
   },
+  taskContainer: status => ({
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    backgroundColor: status === 'Em andamento' ? '#0B88BF' : status === 'Atrasada' ? '#8F1D1D' : '#052F5F',
+    padding: 10,
+    borderRadius: 10,
+  }),
 });
+
+export default HomeScreen;

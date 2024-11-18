@@ -1,61 +1,81 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet } from 'react-native';
-import CustomButton from '../components/CustomButton'; // Importando o componente de botão reutilizável
+import { View, TextInput, StyleSheet, Alert } from 'react-native';
+import CustomButton from '../components/CustomButton'; 
+import axios from 'axios';
 
-const EditProfile = ({ navigation }) => {
+const EditProfile = ({ navigation, route }) => {
   const [name, setName] = useState('');
   const [dob, setDob] = useState('');
   const [cpf, setCpf] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const userId = route.params?.id; // ID do usuário passado como parâmetro
+  console.log("User ID:", userId);  // Verifique se o userId está correto
+
+  const handleSave = async () => {
+    if (!name || !dob || !cpf || !email) {
+      Alert.alert('Erro', 'Todos os campos devem ser preenchidos.');
+      return;
+    }
+
+    try {
+      const response = await axios.put(`http://localhost:5000/api/users/update/${userId}`, {
+        nome: name,
+        email,
+        dataNascimento: dob,
+        cpf,
+      });
+
+      if (response.status === 200) {
+        Alert.alert('Sucesso', 'Perfil atualizado com sucesso!');
+        navigation.navigate('Home');
+      } else {
+        Alert.alert('Erro', 'Erro ao atualizar o perfil.');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Erro', 'Não foi possível conectar ao servidor.');
+    }
+  };
 
   return (
     <View style={styles.container}>
-      {/* Inputs de edição */}
       <TextInput
         placeholder="Nome"
         style={styles.input}
         value={name}
         onChangeText={setName}
-        borderRadius={10}
       />
       <TextInput
         placeholder="Data de Nascimento"
         style={styles.input}
         value={dob}
         onChangeText={setDob}
-        borderRadius={10}
       />
       <TextInput
         placeholder="CPF"
         style={styles.input}
         value={cpf}
         onChangeText={setCpf}
-        borderRadius={10}
       />
       <TextInput
         placeholder="E-mail"
         style={styles.input}
         value={email}
         onChangeText={setEmail}
-        borderRadius={10}
       />
 
-      {/* Botões reutilizáveis */}
-      <CustomButton 
-        text="Salvar alterações" 
-        backgroundColor="#005377" 
+      <CustomButton
+        text="Salvar alterações"
+        backgroundColor="#005377"
         textColor="#fff"
-        borderRadius={10}
-        onPress={() => navigation.navigate('Home')} 
+        onPress={handleSave}
       />
-      <CustomButton 
-        text="Cancelar" 
-        backgroundColor="#8D8D8D" 
+      <CustomButton
+        text="Cancelar"
+        backgroundColor="#8D8D8D"
         textColor="#fff"
-        borderRadius={10}
-        onPress={() => navigation.navigate('Home')} 
+        onPress={() => navigation.navigate('Home')}
       />
       <CustomButton 
         text="Sair da Conta" 
