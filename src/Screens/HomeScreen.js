@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet, ActivityIn
 import { MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 import { useRoute } from '@react-navigation/native';
 
 const HomeScreen = ({ navigation }) => {
@@ -50,10 +51,11 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  useEffect(() => {
-    fetchUserId();
-    fetchTasks();
-  }, [refresh]);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchTasks();
+    }, [])
+  );
 
   useEffect(() => {
     if (userId) {

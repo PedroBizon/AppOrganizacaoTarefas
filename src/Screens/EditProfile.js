@@ -37,6 +37,21 @@ const EditProfile = ({ navigation, route }) => {
       Alert.alert('Erro', 'Não foi possível conectar ao servidor.');
     }
   };
+  const handleDeleteAccount = async () => {
+    try {
+      const response = await axios.delete(`http://localhost:5000/api/users/delete/${userId}`);
+      if (response.status === 200) {
+        Alert.alert('Sucesso', 'Conta excluída com sucesso.');
+        navigation.navigate('Login');
+      } else {
+        Alert.alert('Erro', 'Erro ao excluir a conta.');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Erro', 'Não foi possível conectar ao servidor.');
+    }
+  };
+  
 
   return (
     <View style={styles.container}>
@@ -84,6 +99,13 @@ const EditProfile = ({ navigation, route }) => {
         borderRadius={10}
         onPress={() => navigation.navigate('Login')}
       />
+      <CustomButton 
+        text="Excluir Conta" 
+        backgroundColor="#FF0000" 
+        textColor="#fff"
+        borderRadius={10}
+        onPress={handleDeleteAccount}
+/>
     </View>
   );
 };

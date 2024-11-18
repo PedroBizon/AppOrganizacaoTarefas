@@ -48,7 +48,7 @@ const ShowTask = ({ route, navigation }) => {
         editable={false}
       />
       <TextInput
-        placeholder="DD/MM/AAAA"
+        placeholder="AAAA-MM-DD"
         style={styles.input}
         value={date}
         onChangeText={setDate}

@@ -64,6 +64,19 @@ router.get('/me', authMiddleware, async (req, res) => {
     res.status(500).json({ message: 'Erro ao buscar os dados do usuário' });
   }
 });
+// Deletar conta do usuário
+router.delete('/delete/:id', async (req, res) => {
+  try {
+    const usuario = await User.findByIdAndDelete(req.params.id);
+    if (!usuario) {
+      return res.status(404).json({ message: 'Usuário não encontrado' });
+    }
+    res.json({ message: 'Conta excluída com sucesso' });
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao deletar conta', error: error.message });
+  }
+});
+
 // Login do usuário
 router.post('/login', async (req, res) => {
   console.log('Requisição de login recebida:', req.body); // Logando os dados recebidos
