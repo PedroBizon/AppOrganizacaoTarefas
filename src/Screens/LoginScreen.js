@@ -16,9 +16,10 @@ const LoginScreen = ({ navigation }) => {
         senha: password,  // Utilizando o valor da senha
       });
       console.log('Resposta da API:', response.data); // Logando a resposta
-      const { token, nome } = response.data;
+      const { token, nome, id } = response.data;
       await AsyncStorage.setItem('token', token);
       await AsyncStorage.setItem('nome', nome); // Armazenando nome
+      await AsyncStorage.setItem('userID', id);
 
       navigation.navigate('Loading');
     } catch (error) {

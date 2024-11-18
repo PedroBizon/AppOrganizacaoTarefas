@@ -1,5 +1,6 @@
 const express = require('express');
 const Task = require('../models/Task');
+const authMiddleware = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
@@ -28,15 +29,20 @@ router.post('/create', async (req, res) => {
 module.exports = router;
 
 // Listar tarefas com filtragem de status
-router.get('/', async (req, res) => {
-    const { status } = req.query; // Filtro opcional de status
-    try {
-      const tarefas = await Task.find(status ? { status } : {});
-      res.json(tarefas);
-    } catch (error) {
-      res.status(500).json({ message: 'Erro ao listar tarefas' });
-    }
-  });
+router.get('/', authMiddleware, async (req, res) => {
+  const { status } = req.query; // Filtro opcional de status
+  try {
+    // Filtra tarefas pelo ID do usuário autenticado
+    const tarefas = await Task.find({ 
+      usuario: req.user.id, 
+      ...(status ? { status } : {}) // Aplica o filtro de status, se fornecido
+    });
+    res.json(tarefas);
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao listar tarefas' });
+  }
+});
+
 
 // Editar tarefa
 router.put('/:id', async (req, res) => {

@@ -78,7 +78,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Senha inválida' });
     }
     const token = jwt.sign({ id: user._id }, 'seuSegredo', { expiresIn: '1h' });
-    res.json({ token, nome: user.nome });
+    res.json({ token, nome: user.nome, id: user._id });
   } catch (error) {
     console.log('Erro no servidor:', error); // Logando erros no backend
     res.status(500).json({ message: 'Erro no servidor' });
