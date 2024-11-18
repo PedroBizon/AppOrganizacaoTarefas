@@ -1,61 +1,57 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, Image } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import api from '../services/api';  // Certifique-se de que o arquivo api.js está configurado corretamente.
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Image, Alert } from 'react-native';
+import api from '../services/api'; // Importando a configuração da API
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Para armazenar o token
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [senha, setSenha] = useState('');
 
   const handleLogin = async () => {
-    console.log('Email:', email, 'Senha:', password);  // Verifique se os dados estão corretos
     try {
-      console.log('Enviando dados:', email, password); // Logando antes da requisição
-      const response = await api.post('/users/login', {
-        email,  // Utilizando o valor do email
-        senha: password,  // Utilizando o valor da senha
-      });
-      console.log('Resposta da API:', response.data); // Logando a resposta
-      const { token, nome, id } = response.data;
-      await AsyncStorage.setItem('token', token);
-      await AsyncStorage.setItem('nome', nome); // Armazenando nome
-      await AsyncStorage.setItem('userID', id);
+      const response = await api.post('/users/login', { email, senha });
+      const { token } = response.data;
 
-      navigation.navigate('Loading');
+      // Armazena o token localmente
+      await AsyncStorage.setItem('token', token);
+
+      // Navega para a tela principal
+      navigation.navigate('Home');
     } catch (error) {
-      console.log('Erro no login:', error);
+      Alert.alert('Erro', error.response?.data?.message || 'Erro ao fazer login');
     }
   };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.loginBox}>
-        <Image source={require('../../assets/logo.png')} style={styles.icon} />
-        <TextInput
-          placeholder="E-mail ou CPF"
-          placeholderTextColor="#8D8D8D"
-          style={styles.input}
-          value={email}  // Associando o valor do email
-          onChangeText={setEmail}  // Atualizando o estado do email
-        />
-        <TextInput
-          placeholder="Senha"
-          placeholderTextColor="#8D8D8D"
-          secureTextEntry={true}
-          style={styles.input}
-          value={password}  // Associando o valor da senha
-          onChangeText={setPassword}  // Atualizando o estado da senha
-        />
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Entrar</Text>
-        </TouchableOpacity>
-        <Text style={styles.text}>Não possui uma conta?</Text>
-        <TouchableOpacity style={styles.createAccountButton} onPress={() => navigation.navigate('CreateAccount')}>
-          <Text style={styles.buttonText}>Criar conta</Text>
-        </TouchableOpacity>
-      </View>
+
+ return (
+  <View style={styles.container}>
+    <View style={styles.loginBox}>
+      <Image source={require('../../assets/logo.png')} style={styles.icon} />
+      <TextInput
+        placeholder="E-mail ou CPF"
+        placeholderTextColor="#8D8D8D"
+        style={styles.input}
+        value={email}
+        onChangeText={setEmail}
+      />
+      <TextInput
+        placeholder="Senha"
+        placeholderTextColor="#8D8D8D"
+        secureTextEntry
+        style={styles.input}
+        value={senha}
+        onChangeText={setSenha}
+      />
+      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+        <Text style={styles.buttonText}>Entrar</Text>
+      </TouchableOpacity>
+      <Text style={styles.text}>Não possui uma conta?</Text>
+      <TouchableOpacity style={styles.createAccountButton} onPress={() => navigation.navigate('CreateAccount')}>
+        <Text style={styles.buttonText}>Criar conta</Text>
+      </TouchableOpacity>
     </View>
-  );
+  </View>
+);
 };
 
 const styles = StyleSheet.create({

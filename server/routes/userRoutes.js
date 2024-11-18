@@ -1,6 +1,3 @@
-const authMiddleware = require('../middlewares/authMiddleware');  // Caminho correto para o arquivo
-const jwt = require('jsonwebtoken');  // Importando o JWT
-const bcrypt = require('bcryptjs');  // Para comparar as senhas
 const express = require('express');
 const User = require('../models/user');
 
@@ -56,6 +53,7 @@ router.put('/update/:id', async (req, res) => {
   }
 });
 
+
 router.get('/me', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user.id); // req.user vem do middleware de autenticação
@@ -64,26 +62,5 @@ router.get('/me', authMiddleware, async (req, res) => {
     res.status(500).json({ message: 'Erro ao buscar os dados do usuário' });
   }
 });
-// Login do usuário
-router.post('/login', async (req, res) => {
-  console.log('Requisição de login recebida:', req.body); // Logando os dados recebidos
-  const { email, senha } = req.body;
-  try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: 'Usuário não encontrado' });
-    }
-    const isPasswordValid = await bcrypt.compare(senha, user.senha);
-    if (!isPasswordValid) {
-      return res.status(400).json({ message: 'Senha inválida' });
-    }
-    const token = jwt.sign({ id: user._id }, 'seuSegredo', { expiresIn: '1h' });
-    res.json({ token, nome: user.nome, id: user._id });
-  } catch (error) {
-    console.log('Erro no servidor:', error); // Logando erros no backend
-    res.status(500).json({ message: 'Erro no servidor' });
-  }
-});
-
 
 module.exports = router;

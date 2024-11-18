@@ -8,6 +8,32 @@ const EditTask = ({ navigation }) => {
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
 
+
+  const handleSave = async () => {
+    const taskData = { nome, descricao, prazo, status };
+  
+    try {
+      const response = await fetch(`http://localhost:5000/api/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${userToken}`, // O token JWT do usuário
+        },
+        body: JSON.stringify(taskData),
+      });
+  
+      const result = await response.json();
+      if (response.ok) {
+        alert('Tarefa atualizada com sucesso');
+        navigation.navigate('Home');
+      } else {
+        alert(result.message || 'Erro ao atualizar tarefa');
+      }
+    } catch (error) {
+      alert('Erro na conexão com o servidor');
+    }
+  };  
+
 return (
     <View style={styles.container}>
       {/* Inputs de edição */}
