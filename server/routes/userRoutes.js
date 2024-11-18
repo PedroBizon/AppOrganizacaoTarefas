@@ -63,4 +63,38 @@ router.get('/me', authMiddleware, async (req, res) => {
   }
 });
 
+// Deletar conta do usuário
+router.delete('/delete/:id', async (req, res) => {
+  try {
+    const usuario = await User.findByIdAndDelete(req.params.id);
+    if (!usuario) {
+      return res.status(404).json({ message: 'Usuário não encontrado' });
+    }
+    res.json({ message: 'Conta excluída com sucesso' });
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao deletar conta', error: error.message });
+  }
+});
+
+// Login do usuário
+router.post('/login', async (req, res) => {
+  console.log('Requisição de login recebida:', req.body); // Logando os dados recebidos
+  const { email, senha } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: 'Usuário não encontrado' });
+    }
+    const isPasswordValid = await bcrypt.compare(senha, user.senha);
+    if (!isPasswordValid) {
+      return res.status(400).json({ message: 'Senha inválida' });
+    }
+    const token = jwt.sign({ id: user._id }, 'seuSegredo', { expiresIn: '1h' });
+    res.json({ token, nome: user.nome, id: user._id });
+  } catch (error) {
+    console.log('Erro no servidor:', error); // Logando erros no backend
+    res.status(500).json({ message: 'Erro no servidor' });
+  }
+});
+
 module.exports = router;

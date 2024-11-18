@@ -1,112 +1,123 @@
-import React, { useState } from 'react';
-import { View, TextInput, StyleSheet } from 'react-native';
-import CustomButton from '../components/CustomButton'; 
+import React, { useEffect, useState } from 'react';
+import { View, TextInput, StyleSheet, Alert } from 'react-native';
+import CustomButton from '../components/CustomButton';
+import axios from 'axios';
 
-const EditTask = ({ navigation }) => {
+const EditTask = ({ route, navigation }) => {
+  const { taskId } = route.params; // Recebe o ID da tarefa
   const [taskName, setTaskName] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
 
-
-  const handleSave = async () => {
-    const taskData = { nome, descricao, prazo, status };
-  
-    try {
-      const response = await fetch(`http://localhost:5000/api/tasks/${taskId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${userToken}`, // O token JWT do usuário
-        },
-        body: JSON.stringify(taskData),
-      });
-  
-      const result = await response.json();
-      if (response.ok) {
-        alert('Tarefa atualizada com sucesso');
-        navigation.navigate('Home');
-      } else {
-        alert(result.message || 'Erro ao atualizar tarefa');
+  useEffect(() => {
+    const fetchTaskDetails = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/tasks/${taskId}`);
+        const { nome, descricao, prazo } = response.data;
+        setTaskName(nome);
+        setDescription(descricao);
+        const prazoDate = new Date(prazo);
+        setDate(prazoDate.toISOString().split('T')[0]); // Formato YYYY-MM-DD
+        setTime(prazoDate.toTimeString().substring(0, 5)); // Formato HH:mm
+      } catch (error) {
+        Alert.alert('Erro', 'Erro ao buscar detalhes da tarefa.');
+        console.error(error);
       }
-    } catch (error) {
-      alert('Erro na conexão com o servidor');
-    }
-  };  
+    };
+    fetchTaskDetails();
+  }, [taskId]);
 
-return (
+  const handleSaveChanges = async () => {
+    try {
+      const prazo = `${date}T${time}:00`;
+      await axios.put(`http://localhost:5000/api/tasks/${taskId}`, {
+        nome: taskName,
+        descricao: description,
+        prazo,
+      });
+      Alert.alert('Sucesso', 'Tarefa atualizada com sucesso.');
+      navigation.navigate('Home', { refresh: true }); // Atualiza a Home
+    } catch (error) {
+      Alert.alert('Erro', 'Erro ao atualizar a tarefa.');
+      console.error(error);
+    }
+  };
+
+  const handleDeleteTask = async () => {
+    try {
+      await axios.delete(`http://localhost:5000/api/tasks/${taskId}`);
+      Alert.alert('Sucesso', 'Tarefa excluída com sucesso.');
+      navigation.navigate('Home', { refresh: true }); // Atualiza a Home
+    } catch (error) {
+      Alert.alert('Erro', 'Erro ao excluir a tarefa.');
+      console.error(error);
+    }
+  };
+
+  return (
     <View style={styles.container}>
-      {/* Inputs de edição */}
       <TextInput
         placeholder="Nova Atividade"
         style={styles.input}
         value={taskName}
         onChangeText={setTaskName}
-        borderRadius={10}
       />
       <TextInput
         placeholder="Descrição"
         style={styles.input}
         value={description}
         onChangeText={setDescription}
-        borderRadius={10}
       />
       <TextInput
-        placeholder="DD/MM/AAAA"
+        placeholder="AAAA-MM-DD"
         style={styles.input}
         value={date}
         onChangeText={setDate}
-        borderRadius={10}
       />
       <TextInput
-        placeholder="hh:mm"
+        placeholder="HH:mm"
         style={styles.input}
         value={time}
         onChangeText={setTime}
-        borderRadius={10}
       />
 
-      {/* Botões reutilizáveis */}
-      <CustomButton 
-        text="Salvar Alterações" 
-        backgroundColor="#005377" 
+      <CustomButton
+        text="Salvar Alterações"
+        backgroundColor="#005377"
         textColor="#fff"
-        borderRadius={10}
-        onPress={() => navigation.navigate('Home')} 
+        onPress={handleSaveChanges}
       />
-      <CustomButton 
-        text="Cancelar" 
-        backgroundColor="#8D8D8D" 
+      <CustomButton
+        text="Cancelar"
+        backgroundColor="#8D8D8D"
         textColor="#fff"
-        borderRadius={10}
-        onPress={() => navigation.navigate('Home')} 
+        onPress={() => navigation.navigate('Home')}
       />
-      <CustomButton 
-        text="Excluir Atividade" 
-        backgroundColor="#8F1D1D" 
+      <CustomButton
+        text="Excluir Atividade"
+        backgroundColor="#8F1D1D"
         textColor="#fff"
-        borderRadius={10} 
-        onPress={() => navigation.navigate('Home')} 
+        onPress={handleDeleteTask}
       />
     </View>
-    );
+  );
 };
 
-
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#000',
-      padding: 20,
-      justifyContent: 'center',
-    },
-    input: {
-      backgroundColor: '#fff',
-      padding: 10,
-      borderRadius: 5,
-      marginVertical: 10,
-      fontSize: 16,
-    },
-  });
+  container: {
+    flex: 1,
+    backgroundColor: '#000',
+    padding: 20,
+    justifyContent: 'center',
+  },
+  input: {
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 5,
+    marginVertical: 10,
+    fontSize: 16,
+  },
+});
 
 export default EditTask;

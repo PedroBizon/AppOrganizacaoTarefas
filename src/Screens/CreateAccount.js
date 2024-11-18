@@ -45,7 +45,7 @@ const CreateAccount = ({ navigation }) => {
         onChangeText={setName}
       />
       <TextInput
-        placeholder="Data de Nascimento"
+        placeholder="Data de Nascimento (AAAA-MM-DD)"
         style={styles.input}
         value={dob}
         onChangeText={setDob}
