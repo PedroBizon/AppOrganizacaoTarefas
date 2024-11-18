@@ -5,8 +5,10 @@ const express = require('express');
 const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes'); // Supondo que já crie a rota de usuário
 const taskRoutes = require('./routes/TaskRoutes'); // Supondo que já crie a rota de tarefa
+const cors = require('cors');
 
 const app = express();
+app.use(cors());
 app.use(express.json()); // Para aceitar JSON no corpo da requisição
 
 connectDB(); // Conexão com o MongoDB
