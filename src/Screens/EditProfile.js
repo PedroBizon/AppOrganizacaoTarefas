@@ -77,6 +77,13 @@ const EditProfile = ({ navigation, route }) => {
         textColor="#fff"
         onPress={() => navigation.navigate('Home')}
       />
+      <CustomButton 
+        text="Sair da Conta" 
+        backgroundColor="#8F1D1D" 
+        textColor="#fff"
+        borderRadius={10}
+        onPress={() => navigation.navigate('Login')}
+      />
     </View>
   );
 };
