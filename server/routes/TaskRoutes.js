@@ -18,6 +18,12 @@ router.post('/create', async (req, res) => {
       prazo,
       usuario: usuarioId,
     });
+    if (prazo < Date.now()) {
+      novaTarefa.status = 'Atrasada';
+    }
+    else {
+      novaTarefa.status = 'Em andamento';
+    }
 
     await novaTarefa.save();
     res.status(201).json({ message: 'Tarefa criada com sucesso', tarefa: novaTarefa });
@@ -46,51 +52,57 @@ router.get('/', authMiddleware, async (req, res) => {
 
 // Editar tarefa
 router.put('/:id', async (req, res) => {
-    const { nome, descricao, prazo } = req.body;
-    try {
-      const tarefaAtualizada = await Task.findByIdAndUpdate(
-        req.params.id,
-        { nome, descricao, prazo },
-        { new: true }
-      );
-      res.json(tarefaAtualizada);
-    } catch (error) {
-      res.status(500).json({ message: 'Erro ao editar tarefa' });
-    }
-  });
+  const { nome, descricao, prazo } = req.body;
 
-// Excluir tarefa
-router.delete('/:id', async (req, res) => {
-    try {
-      await Task.findByIdAndDelete(req.params.id);
-      res.json({ message: 'Tarefa excluída com sucesso' });
-    } catch (error) {
-      res.status(500).json({ message: 'Erro ao excluir tarefa' });
-    }
-  });
-
-// Atualizar status da tarefa
-router.put('/:id/status', async (req, res) => {
-  const { status } = req.body; // O status pode ser 'Em andamento', 'Concluída' ou 'Atrasada'
-  
   try {
     const tarefa = await Task.findById(req.params.id);
-    
+
     if (!tarefa) {
       return res.status(404).json({ message: 'Tarefa não encontrada' });
     }
 
-    // Se a tarefa está sendo marcada como 'Concluída', permitimos a alteração
+    // Atualiza os campos editados
+    tarefa.nome = nome || tarefa.nome;
+    tarefa.descricao = descricao || tarefa.descricao;
+    tarefa.prazo = prazo || tarefa.prazo;
+
+    // Verifica o status com base no prazo
+    const prazoDate = new Date(prazo);
+    const now = new Date();
+
+    if (prazoDate < now && tarefa.status !== 'Concluída') {
+      tarefa.status = 'Atrasada';
+    }
+    else if(prazoDate >= now && tarefa.status != 'Concluída') {
+      tarefa.status = 'Em andamento';
+    }
+
+    await tarefa.save();
+    res.json(tarefa);
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao atualizar a tarefa', error });
+  }
+});
+
+  
+
+// Atualizar status da tarefa
+router.put('/:id/status', async (req, res) => {
+  const { status } = req.body;
+
+  try {
+    const tarefa = await Task.findById(req.params.id);
+
+    if (!tarefa) {
+      return res.status(404).json({ message: 'Tarefa não encontrada' });
+    }
+
     if (status === 'Concluída') {
       tarefa.status = 'Concluída';
+    } else if (tarefa.prazo < Date.now()) {
+      tarefa.status = 'Atrasada';
     } else {
-      // Se a tarefa está sendo marcada como 'Em andamento' ou 'Atrasada'
       tarefa.status = status;
-
-      // Se o status não for 'Concluída' e o prazo já passou, marca como 'Atrasada'
-      if (status !== 'Concluída' && tarefa.prazo < Date.now()) {
-        tarefa.status = 'Atrasada';
-      }
     }
 
     await tarefa.save();
@@ -99,6 +111,7 @@ router.put('/:id/status', async (req, res) => {
     res.status(500).json({ message: 'Erro ao atualizar status da tarefa', error });
   }
 });
+
 // Obter detalhes de uma tarefa pelo ID
 router.get('/:id', async (req, res) => {
   try {
