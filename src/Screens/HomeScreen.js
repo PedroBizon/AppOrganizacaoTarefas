@@ -35,7 +35,7 @@ const HomeScreen = ({ navigation }) => {
   const handleCheckboxPress = async (id, currentStatus) => {
     try {
       const token = await AsyncStorage.getItem('token');
-      let updatedStatus = currentStatus === 'Concluída' ? 'Em andamento' : 'Concluída';
+      let updatedStatus = currentStatus === 'Concluída' ? 'Em andamento' : 'Concluída';;
       const response = await axios.put(
         `http://localhost:5000/api/tasks/${id}/status`,
         { status: updatedStatus },
@@ -53,6 +53,7 @@ const HomeScreen = ({ navigation }) => {
 
   useFocusEffect(
     React.useCallback(() => {
+      fetchUserId();
       fetchTasks();
     }, [])
   );

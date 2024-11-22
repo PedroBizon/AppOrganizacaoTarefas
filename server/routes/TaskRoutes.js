@@ -18,12 +18,6 @@ router.post('/create', async (req, res) => {
       prazo,
       usuario: usuarioId,
     });
-    if (prazo < Date.now()) {
-      novaTarefa.status = 'Atrasada';
-    }
-    else {
-      novaTarefa.status = 'Em andamento';
-    }
 
     await novaTarefa.save();
     res.status(201).json({ message: 'Tarefa criada com sucesso', tarefa: novaTarefa });
@@ -73,7 +67,7 @@ router.put('/:id', async (req, res) => {
     if (prazoDate < now && tarefa.status !== 'Concluída') {
       tarefa.status = 'Atrasada';
     }
-    else if(prazoDate >= now && tarefa.status != 'Concluída') {
+    else if (prazoDate > now && tarefa.status !== 'Concluída') {
       tarefa.status = 'Em andamento';
     }
 
@@ -84,7 +78,16 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-  
+
+// Excluir tarefa
+router.delete('/:id', async (req, res) => {
+    try {
+      await Task.findByIdAndDelete(req.params.id);
+      res.json({ message: 'Tarefa excluída com sucesso' });
+    } catch (error) {
+      res.status(500).json({ message: 'Erro ao excluir tarefa' });
+    }
+  });
 
 // Atualizar status da tarefa
 router.put('/:id/status', async (req, res) => {
